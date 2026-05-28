@@ -136,6 +136,31 @@ export default function WaitingRoom() {
                   ))}
                 </div>
               </div>
+
+              {/* Color Picker */}
+              <div className="mb-4 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Your Color:</span>
+                <div className="flex gap-2 items-center flex-wrap">
+                  {['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#000000', '#ffffff'].map(c => (
+                    <button
+                      key={c}
+                      onClick={() => actions.updateColor(c)}
+                      className="w-5 h-5 rounded-full border border-black/10 dark:border-white/20 transition-transform hover:scale-110"
+                      style={{ backgroundColor: c }}
+                      title={`Select color ${c}`}
+                    />
+                  ))}
+                  <div className="relative w-6 h-6 rounded-full overflow-hidden border border-black/20 cursor-pointer" title="Custom Color">
+                    <div className="absolute inset-0 bg-gradient-to-br from-red-500 via-green-500 to-blue-500 pointer-events-none" />
+                    <input 
+                      type="color" 
+                      className="absolute inset-[-10px] w-12 h-12 opacity-0 cursor-pointer"
+                      onChange={(e) => actions.updateColor(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
               <PlayerGrid />
               {players.length < 2 && (
                 <p className="text-slate-400 dark:text-white/25 text-xs text-center mt-4">{t('shareNote')}</p>

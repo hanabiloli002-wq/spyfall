@@ -33,8 +33,24 @@ export class GameManager {
     return this.rooms.get(roomId) || null;
   }
 
+  getPublicRooms() {
+    const publicRooms = [];
+    for (const [roomId, room] of this.rooms.entries()) {
+      if (room.state === 'waiting' && !room.isPrivate) {
+        publicRooms.push({
+          id: roomId,
+          name: room.name,
+          hostName: room.players.get(room.host)?.name || 'Unknown',
+          playerCount: room.players.size,
+          maxPlayers: room.settings.maxPlayers,
+        });
+      }
+    }
+    return publicRooms;
+  }
+
   // ── Join / Create ───────────────────────────────────────────────────────
-  joinRoom(roomId, socketId, playerName, avatarUrl) {
+  joinRoom(roomId, socketId, playerName, avatarUrl, roomName = null, isPrivate = false) {
     if (!this.rooms.has(roomId)) {
       this.rooms.set(roomId, {
         host: socketId,
@@ -61,6 +77,8 @@ export class GameManager {
           ['all', { name: 'All', type: 'all', members: 'all', messages: [] }],
           ['spy', { name: 'Spy Network', type: 'spy', members: 'spy', messages: [] }]
         ]),
+        name: roomName || `Room ${roomId}`,
+        isPrivate: isPrivate || false,
       });
     }
 
@@ -78,11 +96,23 @@ export class GameManager {
       id: socketId,
       name: playerName,
       avatarUrl,
+      color: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'), // Random hex color
       role: isSpectator ? 'Spectator' : null,
       isSpy: false,
     });
 
     return room;
+  }
+
+  updatePlayerColor(roomId, socketId, color) {
+    const room = this.rooms.get(roomId);
+    if (!room) return null;
+    const player = room.players.get(socketId);
+    if (player) {
+      player.color = color;
+      return true;
+    }
+    return false;
   }
 
   // ── Remove Player ────────────────────────────────────────────────────────
@@ -287,7 +317,12 @@ export class GameManager {
     if (!room || room.state !== 'playing') return null;
 
     if (!room.emergencyVotes) room.emergencyVotes = new Set();
-    room.emergencyVotes.add(playerId);
+    
+    if (room.emergencyVotes.has(playerId)) {
+      room.emergencyVotes.delete(playerId);
+    } else {
+      room.emergencyVotes.add(playerId);
+    }
 
     const activePlayersCount = Array.from(room.players.values()).filter(p => p.role !== 'Spectator').length;
     const required = Math.floor(activePlayersCount / 2) + 1; // More than half
@@ -304,7 +339,6 @@ export class GameManager {
   castVote(roomId, voterId, targetId) {
     const room = this.rooms.get(roomId);
     if (!room || room.state !== 'voting') return null;
-    if (!room.players.has(targetId)) return null;
 
     // Remove any previous vote from this voter
     room.votes.forEach((voters, tid) => {
@@ -314,24 +348,19 @@ export class GameManager {
       }
     });
 
-    // Add new vote
-    room.votes.get(targetId).push(voterId);
-    room.votedPlayers.add(voterId);
+    if (targetId === null) {
+      room.votedPlayers.delete(voterId);
+    } else if (room.players.has(targetId)) {
+      room.votes.get(targetId).push(voterId);
+      room.votedPlayers.add(voterId);
+    } else {
+      return null;
+    }
 
     const votes = this._buildVotesArray(room);
     
-    // Check if we can resolve early: everyone has voted AND there is a clear majority
-    const activePlayers = Array.from(room.players.values()).filter(p => p.role !== 'Spectator');
-    const allVoted = room.votedPlayers.size >= activePlayers.length;
-    
-    let hasMajority = false;
-    room.votes.forEach((voters) => {
-      if (voters.length > Math.floor(activePlayers.length / 2)) {
-        hasMajority = true;
-      }
-    });
-
-    const resolved = allVoted && hasMajority;
+    // Removed early resolution so players can change their minds until timer ends
+    const resolved = false;
 
     if (resolved) {
       room.state = 'ended';

@@ -93,6 +93,11 @@ export default function PlayerGrid({ showRoles = false, compact = false }) {
             </div>
           )}
 
+          {/* Color Indicator */}
+          {player.color && (
+            <div className="absolute bottom-1 right-1 w-3 h-3 rounded-full border border-white/50" style={{ backgroundColor: player.color }} />
+          )}
+
           {/* Shimmer hover effect */}
           <div className="absolute inset-0 rounded-[1.25rem] shimmer-bg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500" />
         </motion.div>

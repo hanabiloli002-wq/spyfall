@@ -347,12 +347,7 @@ export default function GameChat() {
           isOpen ? 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300' : 'bg-violet-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.5)]'
         }`}
       >
-        <span className="text-2xl">{isOpen ? '✕' : '💬'}</span>
-        {!isOpen && totalUnread > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0f1e]">
-            {totalUnread}
-          </span>
-        )}
+        <span className="text-2xl">{isOpen ? '⬇️' : '💬'}</span>
       </button>
     </div>
   );

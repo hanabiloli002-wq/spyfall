@@ -78,18 +78,33 @@ export default function GamePage() {
 
           <div className="flex flex-col gap-2 items-end">
             {!isSpectator && (
-              <motion.button
-                id="emergency-vote-btn"
-                onClick={actions.triggerVote}
-                className={`btn-danger px-4 py-2 text-sm ${emergencyVoteData?.voters?.includes(state.socketId) ? 'opacity-70 cursor-not-allowed' : ''}`}
-                disabled={emergencyVoteData?.voters?.includes(state.socketId)}
-                whileHover={{ scale: emergencyVoteData?.voters?.includes(state.socketId) ? 1 : 1.04 }}
-                whileTap={{ scale: emergencyVoteData?.voters?.includes(state.socketId) ? 1 : 0.96 }}
-              >
-                {emergencyVoteData 
-                  ? `${t('emergencyVote')} (${emergencyVoteData.count}/${emergencyVoteData.required})` 
-                  : t('emergencyVote')}
-              </motion.button>
+              <div className="flex flex-col items-end gap-1">
+                <motion.button
+                  id="emergency-vote-btn"
+                  onClick={actions.triggerVote}
+                  className={`btn-danger px-4 py-2 text-sm ${emergencyVoteData?.voters?.includes(state.socketId) ? 'bg-rose-700/80' : ''}`}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                >
+                  {emergencyVoteData?.voters?.includes(state.socketId)
+                    ? `${t('cancelVote') || 'Cancel Vote'} (${emergencyVoteData.count}/${emergencyVoteData.required})`
+                    : emergencyVoteData
+                      ? `${t('emergencyVote')} (${emergencyVoteData.count}/${emergencyVoteData.required})` 
+                      : t('emergencyVote')}
+                </motion.button>
+                {emergencyVoteData?.voters?.length > 0 && (
+                  <div className="flex -space-x-2 mt-1">
+                    {emergencyVoteData.voters.map(vid => {
+                      const vPlayer = state.players.find(p => p.id === vid);
+                      return vPlayer ? (
+                        <div key={vid} className="w-6 h-6 rounded-full overflow-hidden border-2 border-[#0a0f1e]" title={vPlayer.name}>
+                          <img src={vPlayer.avatarUrl} alt={vPlayer.name} className="w-full h-full object-cover" />
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+              </div>
             )}
             {isSpy && !isSpectator && (
               <motion.button

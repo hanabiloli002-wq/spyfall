@@ -61,6 +61,9 @@ const initialState = {
   // UI
   error: null,
   loading: false,
+
+  // Lobby
+  publicRooms: [],
 };
 
 // ─── Reducer ──────────────────────────────────────────────────────────────
@@ -143,6 +146,7 @@ function reducer(state, action) {
         phase: 'voting',
         votes: [],
         hasVoted: false,
+        votingTimeLimit: action.payload.votingTimeLimit || 60,
       };
 
     case 'VOTE_UPDATE':
@@ -222,7 +226,11 @@ function reducer(state, action) {
         ...initialState,
         connected: state.connected,
         socketId: state.socketId,
+        publicRooms: state.publicRooms,
       };
+
+    case 'ROOM_LIST_UPDATE':
+      return { ...state, publicRooms: action.payload };
 
     default:
       return state;
@@ -233,14 +241,19 @@ function reducer(state, action) {
 export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const joinRoom = useCallback((roomId, playerName, avatarUrl) => {
+  const joinRoom = useCallback((roomId, playerName, avatarUrl, roomName = null, isPrivate = false) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'CLEAR_ERROR' });
     dispatch({ type: 'SET_PLAYER_INFO', payload: { playerName, avatarUrl } });
 
     if (!socket.connected) socket.connect();
+    
+    // We can emit join_room immediately because socket.io buffers it if reconnecting
+    socket.emit('join_room', { roomId, playerName, avatarUrl, roomName, isPrivate });
+  }, []);
 
-    socket.emit('join_room', { roomId, playerName, avatarUrl });
+  const updateColor = useCallback((color) => {
+    socket.emit('update_color', color);
   }, []);
 
   const updateSettings = useCallback((settings) => {
@@ -300,6 +313,7 @@ export function GameProvider({ children }) {
         dispatch,
         actions: {
           joinRoom,
+          updateColor,
           updateSettings,
           startGame,
           triggerVote,

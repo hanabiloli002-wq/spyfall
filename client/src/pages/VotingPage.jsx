@@ -54,8 +54,18 @@ export default function VotingPage() {
           className="text-center mb-8 relative"
         >
           {timeLeft !== null && (
-            <div className="absolute top-0 right-0 glass-card px-4 py-2 border-rose-500/30 text-rose-500 font-bold text-xl flex items-center gap-2 shadow-[0_0_15px_rgba(244,63,94,0.15)]">
-              <span>⏱️</span> {formatTime(timeLeft)}
+            <div className="absolute top-0 right-0 w-48 max-w-full">
+              <div className="glass-card px-4 py-2 mb-2 border-rose-500/30 text-rose-500 font-bold text-xl flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(244,63,94,0.15)]">
+                <span>⏱️</span> {formatTime(timeLeft)}
+              </div>
+              <div className="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-rose-500"
+                  initial={{ width: '100%' }}
+                  animate={{ width: `${Math.max(0, (timeLeft / (state.votingTimeLimit || 60)) * 100)}%` }}
+                  transition={{ ease: "linear", duration: 1 }}
+                />
+              </div>
             </div>
           )}
           <motion.div
@@ -136,8 +146,8 @@ export default function VotingPage() {
                 {settings.showVotes && count > 0 && (
                   <div className="flex flex-wrap justify-center gap-1 mt-2 min-h-[24px]">
                     {getVoteData(player.id).voters.map(voter => (
-                      <div key={voter.id} className="w-5 h-5 rounded-full overflow-hidden ring-1 ring-slate-200 dark:ring-white/20" title={voter.name}>
-                        <img src={voter.avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${voter.name}`} alt={voter.name} className="w-full h-full object-cover" />
+                      <div key={voter.id} className="w-6 h-6 rounded-full overflow-hidden border-2 shadow-sm" style={{ borderColor: voter.color || '#cbd5e1' }} title={voter.name}>
+                        <img src={voter.avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${voter.name}`} alt={voter.name} className="w-full h-full object-cover" style={{ backgroundColor: voter.color ? `${voter.color}20` : 'transparent' }} />
                       </div>
                     ))}
                   </div>
@@ -149,19 +159,30 @@ export default function VotingPage() {
         
         {/* ── Confirm Button ─── */}
         <div className="flex justify-center mb-5">
-          <motion.button
-            disabled={!selectedPlayerId}
-            onClick={handleConfirmVote}
-            whileHover={selectedPlayerId ? { scale: 1.05 } : {}}
-            whileTap={selectedPlayerId ? { scale: 0.95 } : {}}
-            className={`px-8 py-3 rounded-xl font-bold text-lg text-white shadow-lg transition-all ${
-              selectedPlayerId 
-                ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-500/40 cursor-pointer' 
-                : 'bg-slate-400 dark:bg-slate-700 opacity-50 cursor-not-allowed'
-            }`}
-          >
-            Confirm Vote {selectedPlayerId && `for ${players.find(p => p.id === selectedPlayerId)?.name}`}
-          </motion.button>
+          {myCurrentVoteId && myCurrentVoteId === selectedPlayerId ? (
+            <motion.button
+              onClick={() => { actions.castVote(null); setSelectedPlayerId(null); }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-3 rounded-xl font-bold text-lg text-slate-700 bg-slate-200 hover:bg-slate-300 dark:text-white dark:bg-white/10 dark:hover:bg-white/20 transition-all cursor-pointer"
+            >
+              Cancel Vote
+            </motion.button>
+          ) : (
+            <motion.button
+              disabled={!selectedPlayerId}
+              onClick={handleConfirmVote}
+              whileHover={selectedPlayerId ? { scale: 1.05 } : {}}
+              whileTap={selectedPlayerId ? { scale: 0.95 } : {}}
+              className={`px-8 py-3 rounded-xl font-bold text-lg text-white shadow-lg transition-all ${
+                selectedPlayerId 
+                  ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-500/40 cursor-pointer' 
+                  : 'bg-slate-400 dark:bg-slate-700 opacity-50 cursor-not-allowed'
+              }`}
+            >
+              {myCurrentVoteId ? 'Change Vote' : 'Confirm Vote'} {selectedPlayerId && `for ${players.find(p => p.id === selectedPlayerId)?.name}`}
+            </motion.button>
+          )}
         </div>
 
         {/* ── Progress ─── */}

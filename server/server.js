@@ -34,8 +34,16 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 io.on('connection', (socket) => {
   console.log(`[+] Connected: ${socket.id}`);
 
+  // Send initial room list
+  socket.emit('room_list_update', gameManager.getPublicRooms());
+
+  // ─── LOBBY: GET ROOM LIST ──────────────────────────────────────────────────
+  socket.on('get_room_list', () => {
+    socket.emit('room_list_update', gameManager.getPublicRooms());
+  });
+
   // ─── JOIN ROOM ────────────────────────────────────────────────────────────
-  socket.on('join_room', ({ roomId, playerName, avatarUrl }) => {
+  socket.on('join_room', ({ roomId, playerName, avatarUrl, roomName, isPrivate }) => {
     if (!roomId || !playerName) {
       socket.emit('join_error', { message: 'Room ID and name are required.' });
       return;
@@ -56,7 +64,7 @@ io.on('connection', (socket) => {
       return;
     }
 
-    const roomData = gameManager.joinRoom(normalizedRoomId, socket.id, playerName, avatarUrl);
+    const roomData = gameManager.joinRoom(normalizedRoomId, socket.id, playerName, avatarUrl, roomName, isPrivate);
     socket.join(normalizedRoomId);
     socket.data.roomId = normalizedRoomId;
     socket.data.playerName = playerName;
@@ -91,12 +99,13 @@ io.on('connection', (socket) => {
       // also sync current time
       socket.emit('timer_sync', { timeLeft: room.timeLeft, timerRunning: room.timerRunning });
       
-      // Sync chat channels
-      const channels = gameManager.getChannels(roomId, socket.id);
+      // Send chat channels to the joining player
+      const channels = gameManager.getChannels(normalizedRoomId, socket.id);
       socket.emit('chat_channels_sync', channels);
     }
 
     console.log(`[Room ${normalizedRoomId}] ${playerName} joined (${roomData.players.size} players)`);
+    io.emit('room_list_update', gameManager.getPublicRooms());
   });
 
   // ─── UPDATE SETTINGS ─────────────────────────────────────────────────────
@@ -107,6 +116,20 @@ io.on('connection', (socket) => {
 
     gameManager.updateSettings(roomId, settings);
     io.to(roomId).emit('update_settings', gameManager.getRoom(roomId).settings);
+  });
+
+  // ─── UPDATE COLOR ────────────────────────────────────────────────────────
+  socket.on('update_color', (color) => {
+    const roomId = socket.data.roomId;
+    if (!roomId) return;
+    if (gameManager.updatePlayerColor(roomId, socket.id, color)) {
+      const roomData = gameManager.getRoom(roomId);
+      io.to(roomId).emit('update_players', {
+        players: Array.from(roomData.players.values()),
+        host: roomData.host,
+        scores: gameManager.getScores(roomId),
+      });
+    }
   });
 
   // ─── LOCATION SETS DATA ──────────────────────────────────────────────────
@@ -145,6 +168,9 @@ io.on('connection', (socket) => {
         fullSpyData: player.role === 'Spectator' ? gameData.spies : null,
         fullPlayersRoles: player.role === 'Spectator' ? gameManager.getPlayersArray(roomId).map(p => ({ id: p.id, role: p.role, isSpy: p.isSpy })) : null
       });
+      // Also send correct chat channels
+      const channels = gameManager.getChannels(roomId, socketId);
+      io.to(socketId).emit('chat_channels_sync', channels);
     });
 
     console.log(`[Room ${roomId}] Game started — Location: "${gameData.location.name}"`);
@@ -416,6 +442,7 @@ io.on('connection', (socket) => {
       });
       console.log(`[-] Disconnected: ${socket.data.playerName} from ${roomId}`);
     }
+    io.emit('room_list_update', gameManager.getPublicRooms());
   });
 
   // ─── LEAVE ROOM ──────────────────────────────────────────────────────────
@@ -434,6 +461,7 @@ io.on('connection', (socket) => {
         scores: gameManager.getScores(roomId),
       });
     }
+    io.emit('room_list_update', gameManager.getPublicRooms());
   });
 });
 

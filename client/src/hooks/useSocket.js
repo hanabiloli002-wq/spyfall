@@ -34,12 +34,19 @@ export function useSocket() {
     // ── End ──────────────────────────────────────────────────────────────
     const onGameEnded = (data) => dispatch({ type: 'GAME_ENDED', payload: data });
     const onGameReset = (data) => dispatch({ type: 'GAME_RESET', payload: data });
+    socket.on('timer_sync', (data) => dispatch({ type: 'TIMER_SYNC', payload: data }));
+
+    // Lobby / Room List
+    socket.on('room_list_update', (rooms) => dispatch({ type: 'ROOM_LIST_UPDATE', payload: rooms }));
 
     // ── Extras ───────────────────────────────────────────────────────────
     const onKicked = (data) => dispatch({ type: 'KICKED', payload: data });
     const onChatChannelsSync = (data) => dispatch({ type: 'CHAT_CHANNELS_SYNC', payload: data });
     const onChatMsgReceived = (data) => dispatch({ type: 'CHAT_MSG_RECEIVED', payload: data });
     const onWhisperCreated = (data) => dispatch({ type: 'WHISPER_CREATED', payload: data });
+
+    const onTimerSync = (data) => dispatch({ type: 'TIMER_SYNC', payload: data });
+    const onRoomListUpdate = (rooms) => dispatch({ type: 'ROOM_LIST_UPDATE', payload: rooms });
 
     // Register all listeners
     socket.on('connect', onConnect);
@@ -58,6 +65,8 @@ export function useSocket() {
     socket.on('chat_channels_sync', onChatChannelsSync);
     socket.on('chat_msg_received', onChatMsgReceived);
     socket.on('whisper_created', onWhisperCreated);
+    socket.on('timer_sync', onTimerSync);
+    socket.on('room_list_update', onRoomListUpdate);
 
     return () => {
       socket.off('connect', onConnect);
@@ -76,6 +85,8 @@ export function useSocket() {
       socket.off('chat_channels_sync', onChatChannelsSync);
       socket.off('chat_msg_received', onChatMsgReceived);
       socket.off('whisper_created', onWhisperCreated);
+      socket.off('timer_sync', onTimerSync);
+      socket.off('room_list_update', onRoomListUpdate);
     };
   }, [dispatch]);
 }
