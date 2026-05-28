@@ -8,6 +8,7 @@ import WaitingRoom  from './pages/WaitingRoom';
 import GamePage     from './pages/GamePage';
 import VotingPage   from './pages/VotingPage';
 import ResultsPage  from './pages/ResultsPage';
+import GameChat     from './components/GameChat';
 
 // ─── Inner app (needs both contexts) ─────────────────────────────────────
 function AppContent() {
@@ -94,6 +95,9 @@ function AppContent() {
           {pageMap[state.phase] ?? <LobbyPage />}
         </motion.div>
       </AnimatePresence>
+
+      {/* Global Chat (Active whenever in a room) */}
+      {state.phase !== 'lobby' && <GameChat />}
     </div>
   );
 }

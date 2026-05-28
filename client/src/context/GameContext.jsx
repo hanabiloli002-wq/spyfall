@@ -23,6 +23,7 @@ const initialState = {
   phase: 'lobby', // 'lobby' | 'waiting' | 'playing' | 'voting' | 'ended'
   settings: {
     timeLimit: 8,
+    votingTimeLimit: 1,
     locationSets: ['base'],
     numSpies: 1,
     customLocations: [],

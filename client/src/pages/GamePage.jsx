@@ -17,6 +17,7 @@ export default function GamePage() {
   const { isSpy, allLocations, players, firstPlayerId, myRole, playerName, phase, gameResult, fullLocationData, fullSpyData, fullPlayersRoles, settings } = state;
   const [showGuess, setShowGuess] = useState(false);
   const [guess, setGuess] = useState('');
+  const [emergencyVoteData, setEmergencyVoteData] = useState(null);
   const { playStart } = useSound();
   const isSpectator = myRole === 'Spectator';
   
@@ -25,6 +26,14 @@ export default function GamePage() {
   useEffect(() => {
     playStart();
   }, [playStart]);
+
+  useEffect(() => {
+    import('../socket').then(({ default: socket }) => {
+      const onEmergencyUpdate = (data) => setEmergencyVoteData(data);
+      socket.on('emergency_vote_update', onEmergencyUpdate);
+      return () => socket.off('emergency_vote_update', onEmergencyUpdate);
+    });
+  }, []);
 
   const firstPlayer = players.find(p => p.id === firstPlayerId);
   const isMeFirst = firstPlayer && firstPlayer.name === playerName;
@@ -72,11 +81,14 @@ export default function GamePage() {
               <motion.button
                 id="emergency-vote-btn"
                 onClick={actions.triggerVote}
-                className="btn-danger px-4 py-2 text-sm"
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.96 }}
+                className={`btn-danger px-4 py-2 text-sm ${emergencyVoteData?.voters?.includes(state.socketId) ? 'opacity-70 cursor-not-allowed' : ''}`}
+                disabled={emergencyVoteData?.voters?.includes(state.socketId)}
+                whileHover={{ scale: emergencyVoteData?.voters?.includes(state.socketId) ? 1 : 1.04 }}
+                whileTap={{ scale: emergencyVoteData?.voters?.includes(state.socketId) ? 1 : 0.96 }}
               >
-                {t('emergencyVote')}
+                {emergencyVoteData 
+                  ? `${t('emergencyVote')} (${emergencyVoteData.count}/${emergencyVoteData.required})` 
+                  : t('emergencyVote')}
               </motion.button>
             )}
             {isSpy && !isSpectator && (
@@ -169,7 +181,6 @@ export default function GamePage() {
                    </div>
                 </div>
               </div>
-              <GameChat />
             </motion.div>
           )}
         </div>
@@ -210,10 +221,6 @@ export default function GamePage() {
             </div>
           </motion.div>
         )}
-      </div>
-
-      <GameChat />
-
       {/* ── Spy guess modal ─── */}
       <AnimatePresence>
         {showGuess && (

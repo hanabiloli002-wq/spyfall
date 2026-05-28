@@ -179,6 +179,7 @@ export class GameManager {
     room.timerRunning = !!room.settings.autoStartTimer;
     room.votes = new Map();
     room.votedPlayers = new Set();
+    room.emergencyVotes = new Set();
     room.gameStartTime = Date.now();
     room.votingHistory = [];
 
@@ -274,26 +275,65 @@ export class GameManager {
     room.state = 'voting';
     room.votes = new Map();
     room.votedPlayers = new Set();
+    if (room.emergencyVotes) room.emergencyVotes.clear();
 
     // Initialize vote entries for all players
     room.players.forEach((_, id) => room.votes.set(id, []));
+  }
+
+  // ── Request Emergency Vote ────────────────────────────────────────────────
+  requestEmergencyVote(roomId, playerId) {
+    const room = this.rooms.get(roomId);
+    if (!room || room.state !== 'playing') return null;
+
+    if (!room.emergencyVotes) room.emergencyVotes = new Set();
+    room.emergencyVotes.add(playerId);
+
+    const activePlayersCount = Array.from(room.players.values()).filter(p => p.role !== 'Spectator').length;
+    const required = Math.floor(activePlayersCount / 2) + 1; // More than half
+
+    return {
+      count: room.emergencyVotes.size,
+      required,
+      triggered: room.emergencyVotes.size >= required,
+      voters: Array.from(room.emergencyVotes)
+    };
   }
 
   // ── Cast Vote ────────────────────────────────────────────────────────────
   castVote(roomId, voterId, targetId) {
     const room = this.rooms.get(roomId);
     if (!room || room.state !== 'voting') return null;
-    if (room.votedPlayers.has(voterId)) return null;
     if (!room.players.has(targetId)) return null;
 
-    room.votedPlayers.add(voterId);
-    if (!room.votes.has(targetId)) room.votes.set(targetId, []);
+    // Remove any previous vote from this voter
+    room.votes.forEach((voters, tid) => {
+      const idx = voters.indexOf(voterId);
+      if (idx !== -1) {
+        voters.splice(idx, 1);
+      }
+    });
+
+    // Add new vote
     room.votes.get(targetId).push(voterId);
+    room.votedPlayers.add(voterId);
 
     const votes = this._buildVotesArray(room);
-    const allVoted = room.votedPlayers.size >= room.players.size;
+    
+    // Check if we can resolve early: everyone has voted AND there is a clear majority
+    const activePlayers = Array.from(room.players.values()).filter(p => p.role !== 'Spectator');
+    const allVoted = room.votedPlayers.size >= activePlayers.length;
+    
+    let hasMajority = false;
+    room.votes.forEach((voters) => {
+      if (voters.length > Math.floor(activePlayers.length / 2)) {
+        hasMajority = true;
+      }
+    });
 
-    if (allVoted) {
+    const resolved = allVoted && hasMajority;
+
+    if (resolved) {
       room.state = 'ended';
       return {
         votes,
@@ -449,6 +489,7 @@ export class GameManager {
     room.timerRunning = false;
     room.votes = new Map();
     room.votedPlayers = new Set();
+    room.emergencyVotes = new Set();
 
     room.players.forEach(player => {
       player.role = null;

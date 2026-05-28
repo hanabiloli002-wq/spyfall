@@ -157,12 +157,28 @@ io.on('connection', (socket) => {
         const currentRoom = gameManager.getRoom(roomId);
         if (currentRoom && currentRoom.state === 'playing') {
           gameManager.triggerVote(roomId);
+          const votingTime = (currentRoom.settings.votingTimeLimit || 1) * 60;
+          currentRoom.timeLeft = votingTime;
           io.to(roomId).emit('vote_started', {
             players: gameManager.getPlayersArray(roomId),
             reason: 'timeout',
             triggeredBy: null,
+            votingTimeLimit: votingTime
           });
           console.log(`[Room ${roomId}] Timer expired — vote triggered`);
+          
+          const onVoteTick = (timeLeft, timerRunning) => {
+            io.to(roomId).emit('vote_timer_sync', { timeLeft, timerRunning });
+            if (timeLeft <= 0) {
+              const r = gameManager.getRoom(roomId);
+              if (r && r.state === 'voting') {
+                r.state = 'ended';
+                io.to(roomId).emit('game_ended', { ...gameManager._resolveVote(r), scores: gameManager.getScores(roomId) });
+                console.log(`[Room ${roomId}] Voting timer expired — game ended`);
+              }
+            }
+          };
+          gameManager.startTimer(roomId, onVoteTick);
         }
       }
     };
@@ -191,11 +207,26 @@ io.on('connection', (socket) => {
           const currentRoom = gameManager.getRoom(roomId);
           if (currentRoom && currentRoom.state === 'playing') {
             gameManager.triggerVote(roomId);
+            const votingTime = (currentRoom.settings.votingTimeLimit || 1) * 60;
+            currentRoom.timeLeft = votingTime;
             io.to(roomId).emit('vote_started', {
               players: gameManager.getPlayersArray(roomId),
               reason: 'timeout',
               triggeredBy: null,
+              votingTimeLimit: votingTime
             });
+            
+            const onVoteTick = (t, running) => {
+              io.to(roomId).emit('vote_timer_sync', { timeLeft: t, timerRunning: running });
+              if (t <= 0) {
+                const r = gameManager.getRoom(roomId);
+                if (r && r.state === 'voting') {
+                  r.state = 'ended';
+                  io.to(roomId).emit('game_ended', { ...gameManager._resolveVote(r), scores: gameManager.getScores(roomId) });
+                }
+              }
+            };
+            gameManager.startTimer(roomId, onVoteTick);
           }
         }
       };
@@ -210,14 +241,41 @@ io.on('connection', (socket) => {
     const room = gameManager.getRoom(roomId);
     if (!room || room.state !== 'playing') return;
 
-    gameManager.triggerVote(roomId);
-    io.to(roomId).emit('vote_started', {
-      players: gameManager.getPlayersArray(roomId),
-      reason: 'emergency',
-      triggeredBy: socket.data.playerName,
-    });
+    const req = gameManager.requestEmergencyVote(roomId, socket.id);
+    if (!req) return;
 
-    console.log(`[Room ${roomId}] Emergency vote by ${socket.data.playerName}`);
+    if (req.triggered) {
+      gameManager.triggerVote(roomId);
+      const votingTime = (room.settings.votingTimeLimit || 1) * 60;
+      room.timeLeft = votingTime;
+      
+      io.to(roomId).emit('vote_started', {
+        players: gameManager.getPlayersArray(roomId),
+        reason: 'emergency',
+        triggeredBy: socket.data.playerName,
+        votingTimeLimit: votingTime
+      });
+      console.log(`[Room ${roomId}] Emergency vote triggered!`);
+
+      const onVoteTick = (timeLeft, timerRunning) => {
+        io.to(roomId).emit('vote_timer_sync', { timeLeft, timerRunning });
+        if (timeLeft <= 0) {
+          const r = gameManager.getRoom(roomId);
+          if (r && r.state === 'voting') {
+            r.state = 'ended';
+            io.to(roomId).emit('game_ended', { ...gameManager._resolveVote(r), scores: gameManager.getScores(roomId) });
+          }
+        }
+      };
+      gameManager.startTimer(roomId, onVoteTick);
+    } else {
+      io.to(roomId).emit('emergency_vote_update', {
+        count: req.count,
+        required: req.required,
+        voters: req.voters
+      });
+      console.log(`[Room ${roomId}] Emergency vote ${req.count}/${req.required} by ${socket.data.playerName}`);
+    }
   });
 
   // ─── CAST VOTE ───────────────────────────────────────────────────────────

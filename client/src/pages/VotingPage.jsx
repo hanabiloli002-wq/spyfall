@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useGame } from '../context/GameContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -6,42 +6,78 @@ import { useLanguage } from '../context/LanguageContext';
 export default function VotingPage() {
   const { state, actions } = useGame();
   const { t } = useLanguage();
-  const { players, votes, hasVoted, settings } = state;
+  const { players, votes, settings, socketId } = state;
+
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [selectedPlayerId, setSelectedPlayerId] = useState(null);
+
+  // Find user's currently locked vote
+  const myCurrentVoteId = votes.find(v => v.voters.some(voter => voter.id === socketId))?.targetId;
+
+  useEffect(() => {
+    import('../socket').then(({ default: socket }) => {
+      const onVoteTimerSync = (data) => setTimeLeft(data.timeLeft);
+      socket.on('vote_timer_sync', onVoteTimerSync);
+      return () => socket.off('vote_timer_sync', onVoteTimerSync);
+    });
+  }, []);
 
   const getVoteData = (id) => votes.find(v => v.targetId === id) || { voteCount: 0, voters: [] };
   const getCount = (id) => getVoteData(id).voteCount;
+  
+  // Only count active players for voting percentage calculation
+  const activePlayers = players.filter(p => p.role !== 'Spectator');
   const totalVotes = votes.reduce((s, v) => s + v.voteCount, 0);
-  const maxVotes   = Math.max(...players.map(p => getCount(p.id)), 0);
+  const maxVotes = Math.max(...activePlayers.map(p => getCount(p.id)), 0);
+
+  const formatTime = (secs) => {
+    if (secs === null) return '--:--';
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  const handleConfirmVote = () => {
+    if (!selectedPlayerId) return;
+    actions.castVote(selectedPlayerId);
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 py-8">
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-2xl relative z-10">
 
-        {/* ── Header ─── */}
+        {/* ── Timer & Header ─── */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 22 }}
-          className="text-center mb-8"
+          className="text-center mb-8 relative"
         >
+          {timeLeft !== null && (
+            <div className="absolute top-0 right-0 glass-card px-4 py-2 border-rose-500/30 text-rose-500 font-bold text-xl flex items-center gap-2 shadow-[0_0_15px_rgba(244,63,94,0.15)]">
+              <span>⏱️</span> {formatTime(timeLeft)}
+            </div>
+          )}
           <motion.div
             className="text-5xl mb-3"
             animate={{ rotate: [-5, 5, -5] }}
             transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
           >🗳️</motion.div>
           <h1 className="text-3xl font-black text-slate-800 dark:text-white mb-2">
-            {t('voteTitle')} <span className="gradient-text-rose">{t('voteSpy')}</span>
+            Special Discussion & <span className="gradient-text-rose">Voting</span>
           </h1>
           <p className="text-slate-500 dark:text-white/40 text-sm">
-            {hasVoted ? t('voteCastMsg') : t('voteInstruction')}
+            Select a player and confirm your vote. You can change your mind before time runs out!
           </p>
         </motion.div>
 
         {/* ── Player cards ─── */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
-          {players.map((player, i) => {
-            const count     = getCount(player.id);
+          {activePlayers.map((player, i) => {
+            const count = getCount(player.id);
             const isLeading = count > 0 && count === maxVotes;
+            const isSelected = selectedPlayerId === player.id;
+            const isMyVote = myCurrentVoteId === player.id;
 
             return (
               <motion.button
@@ -50,14 +86,12 @@ export default function VotingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.07, type: 'spring', stiffness: 250, damping: 22 }}
-                onClick={() => !hasVoted && actions.castVote(player.id)}
-                disabled={hasVoted}
-                className={`glass-card p-4 flex flex-col items-center text-center transition-all duration-200 relative overflow-hidden ${
-                  !hasVoted ? 'hover:bg-slate-50/50 dark:hover:bg-white/10 cursor-pointer' : 'cursor-default'
-                } ${isLeading ? 'border-rose-500/60' : ''}`}
-                style={isLeading ? { boxShadow: '0 0 20px rgba(244,63,94,0.2)' } : {}}
-                whileHover={!hasVoted ? { scale: 1.05, y: -2 } : {}}
-                whileTap={!hasVoted ? { scale: 0.95 } : {}}
+                onClick={() => setSelectedPlayerId(player.id)}
+                className={`glass-card p-4 flex flex-col items-center text-center transition-all duration-200 relative overflow-hidden cursor-pointer ${
+                  isSelected ? 'bg-violet-500/10 border-violet-500 ring-2 ring-violet-500/50 shadow-[0_0_15px_rgba(139,92,246,0.3)]' : 'hover:bg-slate-50/50 dark:hover:bg-white/10 border-transparent'
+                } ${isMyVote && !isSelected ? 'border-emerald-500/50 bg-emerald-500/5' : ''}`}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
               >
                 {isLeading && (
                   <motion.div
@@ -66,9 +100,15 @@ export default function VotingPage() {
                     className="absolute top-2 right-2 text-xs text-rose-500"
                   >⬆</motion.div>
                 )}
+                
+                {isMyVote && (
+                  <div className="absolute top-2 left-2 text-xs bg-emerald-500 text-white px-2 py-0.5 rounded-full font-bold shadow-sm">
+                    Voted
+                  </div>
+                )}
 
-                <div className={`w-14 h-14 rounded-full overflow-hidden mb-2 ring-2 transition-all ${
-                  isLeading ? 'ring-rose-500/60' : 'ring-slate-200 dark:ring-white/15'
+                <div className={`w-14 h-14 rounded-full overflow-hidden mb-2 ring-2 transition-all mt-4 ${
+                  isSelected ? 'ring-violet-500' : isMyVote ? 'ring-emerald-500' : 'ring-slate-200 dark:ring-white/15'
                 }`}>
                   <img src={player.avatarUrl} alt={player.name} className="w-full h-full object-cover" />
                 </div>
@@ -79,7 +119,7 @@ export default function VotingPage() {
                   <motion.div
                     className={`h-full rounded-full ${isLeading ? 'bg-rose-500' : 'bg-slate-300 dark:bg-white/30'}`}
                     initial={{ width: '0%' }}
-                    animate={{ width: totalVotes > 0 ? `${(count / players.length) * 100}%` : '0%' }}
+                    animate={{ width: totalVotes > 0 ? `${(count / activePlayers.length) * 100}%` : '0%' }}
                     transition={{ duration: 0.5 }}
                   />
                 </div>
@@ -94,7 +134,7 @@ export default function VotingPage() {
 
                 {/* Show who voted */}
                 {settings.showVotes && count > 0 && (
-                  <div className="flex flex-wrap justify-center gap-1 mt-2">
+                  <div className="flex flex-wrap justify-center gap-1 mt-2 min-h-[24px]">
                     {getVoteData(player.id).voters.map(voter => (
                       <div key={voter.id} className="w-5 h-5 rounded-full overflow-hidden ring-1 ring-slate-200 dark:ring-white/20" title={voter.name}>
                         <img src={voter.avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${voter.name}`} alt={voter.name} className="w-full h-full object-cover" />
@@ -106,6 +146,23 @@ export default function VotingPage() {
             );
           })}
         </div>
+        
+        {/* ── Confirm Button ─── */}
+        <div className="flex justify-center mb-5">
+          <motion.button
+            disabled={!selectedPlayerId}
+            onClick={handleConfirmVote}
+            whileHover={selectedPlayerId ? { scale: 1.05 } : {}}
+            whileTap={selectedPlayerId ? { scale: 0.95 } : {}}
+            className={`px-8 py-3 rounded-xl font-bold text-lg text-white shadow-lg transition-all ${
+              selectedPlayerId 
+                ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-500/40 cursor-pointer' 
+                : 'bg-slate-400 dark:bg-slate-700 opacity-50 cursor-not-allowed'
+            }`}
+          >
+            Confirm Vote {selectedPlayerId && `for ${players.find(p => p.id === selectedPlayerId)?.name}`}
+          </motion.button>
+        </div>
 
         {/* ── Progress ─── */}
         <motion.div
@@ -116,23 +173,23 @@ export default function VotingPage() {
         >
           <div className="flex items-center justify-between text-sm mb-2">
             <span className="text-slate-500 dark:text-white/40">{t('votesCast')}</span>
-            <span className="text-slate-800 dark:text-white font-semibold">{totalVotes} / {players.length}</span>
+            <span className="text-slate-800 dark:text-white font-semibold">{totalVotes} / {activePlayers.length}</span>
           </div>
           <div className="h-2.5 bg-slate-100 dark:bg-white/8 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-violet-500 to-rose-500 rounded-full"
               initial={{ width: '0%' }}
-              animate={{ width: `${(totalVotes / Math.max(players.length, 1)) * 100}%` }}
+              animate={{ width: `${(totalVotes / Math.max(activePlayers.length, 1)) * 100}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
-          {hasVoted && totalVotes < players.length && (
+          {totalVotes < activePlayers.length && (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="text-slate-400 dark:text-white/30 text-xs text-center mt-2"
             >
-              {t('waitingFor')} {players.length - totalVotes} {players.length - totalVotes !== 1 ? t('moreVotes') : t('moreVote')}...
+              {t('waitingFor')} {activePlayers.length - totalVotes} {activePlayers.length - totalVotes !== 1 ? t('moreVotes') : t('moreVote')}...
             </motion.p>
           )}
         </motion.div>

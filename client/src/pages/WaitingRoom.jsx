@@ -343,6 +343,28 @@ export default function WaitingRoom() {
                   </div>
                 </div>
 
+                {/* Voting Timer */}
+                <div className="mb-6">
+                  <label className="text-slate-500 dark:text-white/35 text-xs uppercase tracking-widest mb-2 block">
+                    Voting Time (Discussion)
+                  </label>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {[1, 2, 3, 5].map(m => (
+                      <button
+                        key={`vote-${m}`}
+                        onClick={() => actions.updateSettings({ votingTimeLimit: m })}
+                        className={`py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                          (settings.votingTimeLimit || 1) === m
+                            ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20'
+                            : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-white/45 hover:bg-slate-200 dark:hover:bg-white/10'
+                        }`}
+                      >
+                        {m}{t('minutes')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <motion.button
                   id="start-game-btn"
                   onClick={actions.startGame}
