@@ -342,9 +342,10 @@ io.on('connection', (socket) => {
       io.to(roomId).emit('vote_update', { votes: result.votes });
       if (result.resolved) {
         setTimeout(() => {
-          if (room.timer) {
-            clearInterval(room.timer);
-            room.timerRunning = false;
+          const r = gameManager.getRoom(roomId);
+          if (r && r.timer) {
+            clearInterval(r.timer);
+            r.timerRunning = false;
           }
           handleVoteResolution(roomId);
         }, 1000); // 1-second dramatic pause before resolving
