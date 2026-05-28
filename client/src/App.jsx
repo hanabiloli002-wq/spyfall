@@ -37,7 +37,7 @@ function AppContent() {
       className={`relative min-h-screen transition-colors duration-500 ${
         darkMode
           ? 'bg-gradient-to-br from-[#0a0f1e] via-[#0d1526] to-[#0a1020]'
-          : 'bg-gradient-to-br from-slate-300 via-slate-200 to-slate-400'
+          : 'bg-gradient-to-br from-slate-400 via-slate-300 to-slate-400'
       }`}
     >
       {/* Ambient orbs — dimmer in light mode */}

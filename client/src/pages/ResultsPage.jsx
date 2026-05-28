@@ -216,7 +216,7 @@ export default function ResultsPage() {
                 className={`flex flex-col items-center text-center p-3 rounded-xl ${
                   player.isSpy
                     ? 'bg-rose-500/10 border border-rose-500/20'
-                    : 'bg-slate-50 border border-slate-200 dark:bg-white/4 dark:border-white/8'
+                    : 'bg-slate-50 border border-slate-200 dark:bg-white/5 dark:border-white/10'
                 }`}
               >
                 <img src={player.avatarUrl} alt={player.name} className="w-10 h-10 rounded-full mb-1.5 ring-2 ring-slate-200 dark:ring-white/15" />
