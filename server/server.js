@@ -21,6 +21,49 @@ const io = new Server(httpServer, {
 
 const gameManager = new GameManager();
 
+// Helper to handle voting resolution logic cleanly
+const handleVoteResolution = (roomId) => {
+  const room = gameManager.getRoom(roomId);
+  if (!room || room.state !== 'voting') return;
+
+  const resolution = gameManager._resolveVote(room);
+  
+  if (resolution.spyCaught) {
+    room.state = 'spy_guessing';
+    console.log(`[Room ${roomId}] Spy caught via vote! Spy must now guess the location.`);
+    io.to(roomId).emit('spy_must_guess', resolution);
+    
+    // Start a timer for the spy to guess (e.g. 60 seconds)
+    gameManager.startTimer(roomId, (timeLeft, timerRunning) => {
+      io.to(roomId).emit('vote_timer_sync', { timeLeft, timerRunning });
+      if (timeLeft <= 0) {
+        // Time ran out for spy! Detectives win.
+        if (room.timer) clearInterval(room.timer);
+        room.state = 'ended';
+        
+        // Add scores for detectives since spy failed to guess in time
+        room.players.forEach(p => {
+          if (!p.isSpy && p.role !== 'Spectator' && room.scores.has(p.name)) {
+            room.scores.get(p.name).detectiveWins++;
+          }
+        });
+        
+        io.to(roomId).emit('game_ended', { 
+          ...resolution,
+          location: room.currentLocation,
+          guessResult: 'timeout',
+          scores: gameManager.getScores(roomId) 
+        });
+        console.log(`[Room ${roomId}] Spy guessing time ran out.`);
+      }
+    }, 60); // 60 seconds for spy to guess
+  } else {
+    room.state = 'ended';
+    io.to(roomId).emit('game_ended', { ...resolution, scores: gameManager.getScores(roomId) });
+    console.log(`[Room ${roomId}] Game ended via vote. Spy found: false`);
+  }
+};
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', rooms: gameManager.getRoomCount() });
@@ -196,12 +239,7 @@ io.on('connection', (socket) => {
           const onVoteTick = (timeLeft, timerRunning) => {
             io.to(roomId).emit('vote_timer_sync', { timeLeft, timerRunning });
             if (timeLeft <= 0) {
-              const r = gameManager.getRoom(roomId);
-              if (r && r.state === 'voting') {
-                r.state = 'ended';
-                io.to(roomId).emit('game_ended', { ...gameManager._resolveVote(r), scores: gameManager.getScores(roomId) });
-                console.log(`[Room ${roomId}] Voting timer expired — game ended`);
-              }
+              handleVoteResolution(roomId);
             }
           };
           gameManager.startTimer(roomId, onVoteTick);
@@ -245,11 +283,7 @@ io.on('connection', (socket) => {
             const onVoteTick = (t, running) => {
               io.to(roomId).emit('vote_timer_sync', { timeLeft: t, timerRunning: running });
               if (t <= 0) {
-                const r = gameManager.getRoom(roomId);
-                if (r && r.state === 'voting') {
-                  r.state = 'ended';
-                  io.to(roomId).emit('game_ended', { ...gameManager._resolveVote(r), scores: gameManager.getScores(roomId) });
-                }
+                handleVoteResolution(roomId);
               }
             };
             gameManager.startTimer(roomId, onVoteTick);
@@ -286,11 +320,7 @@ io.on('connection', (socket) => {
       const onVoteTick = (timeLeft, timerRunning) => {
         io.to(roomId).emit('vote_timer_sync', { timeLeft, timerRunning });
         if (timeLeft <= 0) {
-          const r = gameManager.getRoom(roomId);
-          if (r && r.state === 'voting') {
-            r.state = 'ended';
-            io.to(roomId).emit('game_ended', { ...gameManager._resolveVote(r), scores: gameManager.getScores(roomId) });
-          }
+          handleVoteResolution(roomId);
         }
       };
       gameManager.startTimer(roomId, onVoteTick);
@@ -312,9 +342,12 @@ io.on('connection', (socket) => {
       io.to(roomId).emit('vote_update', { votes: result.votes });
       if (result.resolved) {
         setTimeout(() => {
-          io.to(roomId).emit('game_ended', { ...result.endData, scores: gameManager.getScores(roomId) });
-          console.log(`[Room ${roomId}] Game ended via vote - spy found: ${result.endData.spyFound}`);
-        }, 4000);
+          if (room.timer) {
+            clearInterval(room.timer);
+            room.timerRunning = false;
+          }
+          handleVoteResolution(roomId);
+        }, 1000); // 1-second dramatic pause before resolving
       }
     }
   });

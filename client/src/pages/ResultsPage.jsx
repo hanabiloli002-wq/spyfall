@@ -31,9 +31,9 @@ export default function ResultsPage() {
   const [revealed, setRevealed] = useState(false);
   const { playReveal, playWin, playLose } = useSound();
 
-  const { type, spyFound, spyPlayer, location, accusedPlayer, correct, guessedLocation, allPlayers } = gameResult || {};
+  const { type, spyFound, spyPlayer, location, accusedPlayer, correct, guessedLocation, guessResult, allPlayers } = gameResult || {};
 
-  const spyWins   = type === 'vote' ? !spyFound : correct;
+  const spyWins = guessResult === 'timeout' ? false : (type === 'vote' ? !spyFound : correct);
   const playersWin = !spyWins;
   const iWon = isSpy ? spyWins : playersWin;
 
@@ -80,6 +80,9 @@ export default function ResultsPage() {
     : { boxShadow: '0 0 60px rgba(16,185,129,0.15)' };
 
   const subtitle = (() => {
+    if (guessResult === 'timeout') {
+      return "The Spy ran out of time to guess the location!";
+    }
     if (type === 'vote') {
       return spyFound
         ? t('spyFoundMsg',  accusedPlayer?.name ?? '?')

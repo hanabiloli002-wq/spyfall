@@ -359,11 +359,20 @@ export class GameManager {
 
     const votes = this._buildVotesArray(room);
     
-    // Removed early resolution so players can change their minds until timer ends
-    const resolved = false;
+    // Restore early resolution: everyone has voted AND there is a clear majority
+    const activePlayers = Array.from(room.players.values()).filter(p => p.role !== 'Spectator');
+    const allVoted = room.votedPlayers.size >= activePlayers.length;
+    
+    let hasMajority = false;
+    room.votes.forEach((voters) => {
+      if (voters.length > Math.floor(activePlayers.length / 2)) {
+        hasMajority = true;
+      }
+    });
+
+    const resolved = allVoted && hasMajority;
 
     if (resolved) {
-      room.state = 'ended';
       return {
         votes,
         resolved: true,
@@ -389,40 +398,42 @@ export class GameManager {
     const spies = Array.from(room.players.values()).filter(p => p.isSpy);
     const spyFound = !!(accused && accused.isSpy);
 
-    // Update Scores
-    if (spyFound) {
-      room.players.forEach(p => {
-        if (!p.isSpy && p.role !== 'Spectator' && room.scores.has(p.name)) {
-          room.scores.get(p.name).detectiveWins++;
-        }
-      });
-    } else {
-      spies.forEach(spy => {
-        if (room.scores.has(spy.name)) {
-          room.scores.get(spy.name).spyWins++;
-        }
-      });
-    }
-
     const durationMs = Date.now() - (room.gameStartTime || Date.now());
     const durationStr = Math.floor(durationMs / 60000) + 'm ' + Math.floor((durationMs % 60000) / 1000) + 's';
-    
-    // Achievements
+
+    // If Spy is caught, do NOT assign scores yet, return spyCaught flag
+    if (spyFound) {
+      return {
+        type: 'vote',
+        spyCaught: true, // New flag to trigger spy_guessing phase
+        accusedPlayer: { id: accused.id, name: accused.name, avatarUrl: accused.avatarUrl, isSpy: true },
+        spyPlayer: spies[0] ? { id: spies[0].id, name: spies[0].name, avatarUrl: spies[0].avatarUrl } : null,
+        spies: spies.map(spy => ({ id: spy.id, name: spy.name, avatarUrl: spy.avatarUrl })),
+        votes: this._buildVotesArray(room),
+        allPlayers: Array.from(room.players.values()),
+        durationStr
+      };
+    }
+
+    // If Spy is NOT caught, assign scores and end game
+    spies.forEach(spy => {
+      if (room.scores.has(spy.name)) {
+        room.scores.get(spy.name).spyWins++;
+      }
+    });
+
     const achievements = [];
-    if (!spyFound && accused && !accused.isSpy) achievements.push({ title: 'แพะรับบาป (Scapegoat)', name: accused.name });
-    if (!spyFound) spies.forEach(spy => achievements.push({ title: 'จอมเนียน (Master Spy)', name: spy.name }));
-    
-    // Find who started emergency vote (we don't have it tracked here easily, but we can just use basic ones)
+    if (accused && !accused.isSpy) achievements.push({ title: 'แพะรับบาป (Scapegoat)', name: accused.name });
+    spies.forEach(spy => achievements.push({ title: 'จอมเนียน (Master Spy)', name: spy.name }));
 
     return {
       type: 'vote',
-      spyFound,
+      spyCaught: false,
+      spyFound: false, // For legacy compatibility in client
       accusedPlayer: accused
         ? { id: accused.id, name: accused.name, avatarUrl: accused.avatarUrl, isSpy: accused.isSpy }
         : null,
-      spyPlayer: spies[0] // fallback for old code
-        ? { id: spies[0].id, name: spies[0].name, avatarUrl: spies[0].avatarUrl }
-        : null,
+      spyPlayer: spies[0] ? { id: spies[0].id, name: spies[0].name, avatarUrl: spies[0].avatarUrl } : null,
       spies: spies.map(spy => ({ id: spy.id, name: spy.name, avatarUrl: spy.avatarUrl })),
       location: room.currentLocation,
       votes: this._buildVotesArray(room),

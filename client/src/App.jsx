@@ -7,6 +7,7 @@ import LobbyPage   from './pages/LobbyPage';
 import WaitingRoom  from './pages/WaitingRoom';
 import GamePage     from './pages/GamePage';
 import VotingPage   from './pages/VotingPage';
+import SpyGuessingPage from './pages/SpyGuessingPage';
 import ResultsPage  from './pages/ResultsPage';
 import GameChat     from './components/GameChat';
 
@@ -27,6 +28,7 @@ function AppContent() {
     waiting: <WaitingRoom />,
     playing: <GamePage />,
     voting:  <VotingPage />,
+    spy_guessing: <SpyGuessingPage />,
     ended:   <ResultsPage />,
   };
 

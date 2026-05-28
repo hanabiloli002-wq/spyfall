@@ -31,9 +31,10 @@ export function useSocket() {
     const onVoteStarted = (data) => dispatch({ type: 'VOTE_STARTED', payload: data });
     const onVoteUpdate = (data) => dispatch({ type: 'VOTE_UPDATE', payload: data });
 
-    // ── End ──────────────────────────────────────────────────────────────
+    // ─── End ─────────────────────────────────────────────────────────────────
     const onGameEnded = (data) => dispatch({ type: 'GAME_ENDED', payload: data });
     const onGameReset = (data) => dispatch({ type: 'GAME_RESET', payload: data });
+    const onSpyMustGuess = (data) => dispatch({ type: 'SPY_MUST_GUESS', payload: data });
     socket.on('timer_sync', (data) => dispatch({ type: 'TIMER_SYNC', payload: data }));
 
     // Lobby / Room List
@@ -61,6 +62,7 @@ export function useSocket() {
     socket.on('vote_update', onVoteUpdate);
     socket.on('game_ended', onGameEnded);
     socket.on('game_reset', onGameReset);
+    socket.on('spy_must_guess', onSpyMustGuess);
     socket.on('kicked', onKicked);
     socket.on('chat_channels_sync', onChatChannelsSync);
     socket.on('chat_msg_received', onChatMsgReceived);
@@ -81,6 +83,7 @@ export function useSocket() {
       socket.off('vote_update', onVoteUpdate);
       socket.off('game_ended', onGameEnded);
       socket.off('game_reset', onGameReset);
+      socket.off('spy_must_guess', onSpyMustGuess);
       socket.off('kicked', onKicked);
       socket.off('chat_channels_sync', onChatChannelsSync);
       socket.off('chat_msg_received', onChatMsgReceived);

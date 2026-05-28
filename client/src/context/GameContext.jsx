@@ -163,6 +163,13 @@ function reducer(state, action) {
         scores: action.payload.scores || state.scores,
       };
 
+    case 'SPY_MUST_GUESS':
+      return {
+        ...state,
+        phase: 'spy_guessing',
+        gameResult: action.payload,
+      };
+
     case 'GAME_RESET':
       return {
         ...state,
