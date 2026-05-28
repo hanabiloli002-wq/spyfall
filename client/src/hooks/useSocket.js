@@ -35,8 +35,6 @@ export function useSocket() {
     const onGameEnded = (data) => dispatch({ type: 'GAME_ENDED', payload: data });
     const onGameReset = (data) => dispatch({ type: 'GAME_RESET', payload: data });
     const onSpyMustGuess = (data) => dispatch({ type: 'SPY_MUST_GUESS', payload: data });
-    socket.on('timer_sync', (data) => dispatch({ type: 'TIMER_SYNC', payload: data }));
-
     // Lobby / Room List
     socket.on('room_list_update', (rooms) => dispatch({ type: 'ROOM_LIST_UPDATE', payload: rooms }));
 
@@ -47,6 +45,7 @@ export function useSocket() {
     const onWhisperCreated = (data) => dispatch({ type: 'WHISPER_CREATED', payload: data });
 
     const onTimerSync = (data) => dispatch({ type: 'TIMER_SYNC', payload: data });
+    const onVoteTimerSync = (data) => dispatch({ type: 'TIMER_SYNC', payload: data });
     const onRoomListUpdate = (rooms) => dispatch({ type: 'ROOM_LIST_UPDATE', payload: rooms });
 
     // Register all listeners
@@ -68,6 +67,7 @@ export function useSocket() {
     socket.on('chat_msg_received', onChatMsgReceived);
     socket.on('whisper_created', onWhisperCreated);
     socket.on('timer_sync', onTimerSync);
+    socket.on('vote_timer_sync', onVoteTimerSync);
     socket.on('room_list_update', onRoomListUpdate);
 
     return () => {
@@ -89,6 +89,7 @@ export function useSocket() {
       socket.off('chat_msg_received', onChatMsgReceived);
       socket.off('whisper_created', onWhisperCreated);
       socket.off('timer_sync', onTimerSync);
+      socket.off('vote_timer_sync', onVoteTimerSync);
       socket.off('room_list_update', onRoomListUpdate);
     };
   }, [dispatch]);

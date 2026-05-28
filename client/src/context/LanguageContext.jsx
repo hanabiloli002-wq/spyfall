@@ -121,6 +121,7 @@ const T = {
     cancelVote:      'Cancel Vote',
     changeVote:      'Change Vote',
     confirmVote:     'Confirm Vote',
+    timeRemaining:   'Time Remaining',
 
     // Results
     spyWins:     'The Spy Wins!',
@@ -271,6 +272,7 @@ const T = {
     cancelVote:      'ยกเลิกโหวต',
     changeVote:      'เปลี่ยนโหวต',
     confirmVote:     'ยืนยันโหวต',
+    timeRemaining:   'เวลาที่เหลือ',
 
     // Results
     spyWins:     'สายลับชนะ!',

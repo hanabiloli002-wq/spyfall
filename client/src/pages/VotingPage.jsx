@@ -53,21 +53,7 @@ export default function VotingPage() {
           transition={{ type: 'spring', stiffness: 200, damping: 22 }}
           className="text-center mb-8 relative"
         >
-          {timeLeft !== null && (
-            <div className="absolute top-0 right-0 w-48 max-w-full">
-              <div className="glass-card px-4 py-2 mb-2 border-rose-500/30 text-rose-500 font-bold text-xl flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(244,63,94,0.15)]">
-                <span>⏱️</span> {formatTime(timeLeft)}
-              </div>
-              <div className="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-rose-500"
-                  initial={{ width: '100%' }}
-                  animate={{ width: `${Math.max(0, (timeLeft / (state.votingTimeLimit || 60)) * 100)}%` }}
-                  transition={{ ease: "linear", duration: 1 }}
-                />
-              </div>
-            </div>
-          )}
+
           <motion.div
             className="text-5xl mb-3"
             animate={{ rotate: [-5, 5, -5] }}
@@ -79,6 +65,26 @@ export default function VotingPage() {
           <p className="text-slate-500 dark:text-white/40 text-sm">
             {t('voteInstruction')}
           </p>
+
+          {/* New Prominent Timer */}
+          {timeLeft !== null && (
+            <div className="mt-6 w-full max-w-md mx-auto">
+              <div className="flex justify-between items-end mb-2 px-1">
+                <span className="text-slate-500 dark:text-white/50 text-xs font-bold uppercase tracking-wider">{t('timeRemaining') || 'Time Remaining'}</span>
+                <span className="text-rose-500 font-black text-2xl drop-shadow-[0_0_8px_rgba(244,63,94,0.4)]">
+                  {formatTime(timeLeft)}
+                </span>
+              </div>
+              <div className="w-full h-4 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-300 dark:border-slate-700 shadow-inner">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-rose-400 to-rose-600 shadow-[0_0_10px_rgba(244,63,94,0.5)]"
+                  initial={{ width: '100%' }}
+                  animate={{ width: `${Math.max(0, (timeLeft / (state.votingTimeLimit || 60)) * 100)}%` }}
+                  transition={{ ease: "linear", duration: 1 }}
+                />
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* ── Player cards ─── */}
