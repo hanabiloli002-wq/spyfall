@@ -7,11 +7,11 @@
 /* ─── Design tokens ────────────────────────────────────────────────────── */
 @layer base {
   :root {
-    --bg-primary:  #f0f4ff;
-    --surface:     rgba(255, 255, 255, 0.82);
-    --border:      rgba(0, 0, 0, 0.09);
-    --text-primary: #0f172a;
-    --text-muted:   #64748b;
+    --bg-primary:  #e2e8f0; /* softer slate-200 */
+    --surface:     rgba(255, 255, 255, 0.65); /* less opaque white */
+    --border:      rgba(0, 0, 0, 0.12);
+    --text-primary: #1e293b;
+    --text-muted:   #475569;
   }
   .dark {
     --bg-primary:  #0a0f1e;

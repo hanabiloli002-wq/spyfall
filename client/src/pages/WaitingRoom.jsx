@@ -198,44 +198,59 @@ export default function WaitingRoom() {
                       const isActive = settings.locationSets.includes(set.id);
                       const selectedCount = settings.customLocationsSelection?.[set.id]?.length;
                       return (
-                        <div key={set.id} className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
-                          isActive 
-                            ? 'bg-violet-500/10 border-violet-500/30' 
-                            : 'bg-slate-50 dark:bg-white/5 border-transparent opacity-70'
-                        }`}>
-                          <div 
-                            className="flex items-center gap-3 flex-1 cursor-pointer"
-                            onClick={() => {
-                              const newSets = isActive 
-                                ? settings.locationSets.filter(s => s !== set.id)
-                                : [...settings.locationSets, set.id];
-                              actions.updateSettings({ locationSets: newSets });
-                            }}
-                          >
-                            <div className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${
-                              isActive ? 'bg-violet-500 border-violet-500 text-white' : 'border-slate-300 dark:border-white/20'
-                            }`}>
-                              {isActive && '✓'}
-                            </div>
-                            <div>
-                              <span className={`font-semibold text-sm block ${isActive ? 'text-violet-700 dark:text-violet-300' : 'text-slate-700 dark:text-white'}`}>
-                                {set.name}
-                              </span>
-                              {isActive && (
-                                <span className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">
-                                  {selectedCount ? `${selectedCount} locations selected` : 'Default (20 random locations)'}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          {isActive && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setEditingSet({ id: set.id, name: set.name }); }}
-                              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-violet-500/20 text-violet-600 dark:text-violet-400 transition-colors"
-                              title="Edit Locations"
+                        <div key={set.id}>
+                          <div className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                            isActive 
+                              ? 'bg-violet-500/10 border-violet-500/30' 
+                              : 'bg-slate-50 dark:bg-white/5 border-transparent opacity-70'
+                          }`}>
+                            <div 
+                              className="flex items-center gap-3 flex-1 cursor-pointer"
+                              onClick={() => {
+                                const newSets = isActive 
+                                  ? settings.locationSets.filter(s => s !== set.id)
+                                  : [...settings.locationSets, set.id];
+                                actions.updateSettings({ locationSets: newSets });
+                              }}
                             >
-                              ⚙️
-                            </button>
+                              <div className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${
+                                isActive ? 'bg-violet-500 border-violet-500 text-white' : 'border-slate-300 dark:border-white/20'
+                              }`}>
+                                {isActive && '✓'}
+                              </div>
+                              <div>
+                                <span className={`font-semibold text-sm block ${isActive ? 'text-violet-700 dark:text-violet-300' : 'text-slate-700 dark:text-white'}`}>
+                                  {set.name}
+                                </span>
+                                {isActive && set.id !== 'custom' && (
+                                  <span className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">
+                                    {selectedCount ? `${selectedCount} locations selected` : 'Default (20 random locations)'}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            {isActive && set.id !== 'custom' && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setEditingSet({ id: set.id, name: set.name }); }}
+                                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-violet-500/20 text-violet-600 dark:text-violet-400 transition-colors"
+                                title="Edit Locations"
+                              >
+                                ⚙️
+                              </button>
+                            )}
+                          </div>
+                          {isActive && set.id === 'custom' && (
+                            <div className="mt-2 pl-4 border-l-2 border-violet-500/30 ml-2">
+                              <textarea
+                                className="w-full h-32 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/25 focus:ring-2 focus:ring-violet-500 focus:outline-none resize-none"
+                                placeholder={"Enter locations. Format:\nLocationName: Role1, Role2, Role3\n\nExample:\nHogwarts: Wizard, Teacher, Ghost\nSpace Station: Astronaut, Alien"}
+                                value={customText}
+                                onChange={(e) => {
+                                  setCustomText(e.target.value);
+                                  actions.updateSettings({ customLocations: e.target.value.split('\n') });
+                                }}
+                              />
+                            </div>
                           )}
                         </div>
                       );
