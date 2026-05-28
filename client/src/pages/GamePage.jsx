@@ -87,7 +87,7 @@ export default function GamePage() {
                   whileTap={{ scale: 0.96 }}
                 >
                   {emergencyVoteData?.voters?.includes(state.socketId)
-                    ? `${t('cancelVote') || 'Cancel Vote'} (${emergencyVoteData.count}/${emergencyVoteData.required})`
+                    ? `${t('cancelVote')} (${emergencyVoteData.count}/${emergencyVoteData.required})`
                     : emergencyVoteData
                       ? `${t('emergencyVote')} (${emergencyVoteData.count}/${emergencyVoteData.required})` 
                       : t('emergencyVote')}
@@ -174,22 +174,22 @@ export default function GamePage() {
             >
               <div className="glass-card p-6 flex flex-col items-center justify-center text-center border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
                 <span className="text-4xl mb-3">👁️</span>
-                <p className="text-xl font-black text-amber-500 mb-1 uppercase tracking-widest">Omniscient Mode</p>
-                <p className="text-sm text-slate-500 dark:text-white/40 mb-4 font-bold text-rose-500">Do NOT spoil the game!</p>
+                <p className="text-xl font-black text-amber-500 mb-1 uppercase tracking-widest">{t('omniscientMode')}</p>
+                <p className="text-sm text-slate-500 dark:text-white/40 mb-4 font-bold text-rose-500">{t('doNotSpoil')}</p>
                 
                 <div className="w-full bg-slate-800/50 rounded-xl p-4 text-left border border-slate-700/50 mb-4">
-                   <div className="text-xs text-slate-500 uppercase mb-1">True Location</div>
+                   <div className="text-xs text-slate-500 uppercase mb-1">{t('trueLocation')}</div>
                    <div className="text-lg font-bold text-white">{fullLocationData?.name || '?'}</div>
                 </div>
 
                 <div className="w-full bg-slate-800/50 rounded-xl p-4 text-left border border-slate-700/50">
-                   <div className="text-xs text-slate-500 uppercase mb-3">Player Roles</div>
+                   <div className="text-xs text-slate-500 uppercase mb-3">{t('playerRoles')}</div>
                    <div className="space-y-2">
                      {fullPlayersRoles?.filter(p => p.role !== 'Spectator').map(p => (
                        <div key={p.id} className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
                          <span className="text-white font-medium">{players.find(x => x.id === p.id)?.name || 'Unknown'}</span>
                          <span className={`text-sm font-bold ${p.isSpy ? 'text-rose-500' : 'text-emerald-400'}`}>
-                           {p.isSpy ? 'SPY' : p.role}
+                           {p.isSpy ? t('spyLabel') : p.role}
                          </span>
                        </div>
                      ))}
@@ -212,9 +212,9 @@ export default function GamePage() {
           >
             <span className="text-3xl">{isMeFirst ? '🎯' : '🎲'}</span>
             <div className="text-center">
-              <p className="text-xs uppercase tracking-widest text-slate-500 dark:text-white/40 mb-1">First Question</p>
+              <p className="text-xs uppercase tracking-widest text-slate-500 dark:text-white/40 mb-1">{t('firstQuestion')}</p>
               <p className={`text-lg font-black ${isMeFirst ? 'text-violet-600 dark:text-violet-300' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                {isMeFirst ? 'คุณเป็นคนเริ่มถามคำถามแรก!' : `👉 ${firstPlayer.name} เริ่มถามคำถามแรก!`}
+                {isMeFirst ? t('youAskFirst') : t('playerAsksFirst', firstPlayer.name)}
               </p>
             </div>
           </motion.div>

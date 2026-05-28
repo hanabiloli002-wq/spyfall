@@ -74,10 +74,10 @@ export default function VotingPage() {
             transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
           >🗳️</motion.div>
           <h1 className="text-3xl font-black text-slate-800 dark:text-white mb-2">
-            Special Discussion & <span className="gradient-text-rose">Voting</span>
+            {t('voteTitle')} <span className="gradient-text-rose">{t('voteSpy')}</span>
           </h1>
           <p className="text-slate-500 dark:text-white/40 text-sm">
-            Select a player and confirm your vote. You can change your mind before time runs out!
+            {t('voteInstruction')}
           </p>
         </motion.div>
 
@@ -113,7 +113,7 @@ export default function VotingPage() {
                 
                 {isMyVote && (
                   <div className="absolute top-2 left-2 text-xs bg-emerald-500 text-white px-2 py-0.5 rounded-full font-bold shadow-sm">
-                    Voted
+                    {t('voted')}
                   </div>
                 )}
 
@@ -166,7 +166,7 @@ export default function VotingPage() {
               whileTap={{ scale: 0.95 }}
               className="px-8 py-3 rounded-xl font-bold text-lg text-slate-700 bg-slate-200 hover:bg-slate-300 dark:text-white dark:bg-white/10 dark:hover:bg-white/20 transition-all cursor-pointer"
             >
-              Cancel Vote
+              {t('cancelVote')}
             </motion.button>
           ) : (
             <motion.button
@@ -180,7 +180,7 @@ export default function VotingPage() {
                   : 'bg-slate-400 dark:bg-slate-700 opacity-50 cursor-not-allowed'
               }`}
             >
-              {myCurrentVoteId ? 'Change Vote' : 'Confirm Vote'} {selectedPlayerId && `for ${players.find(p => p.id === selectedPlayerId)?.name}`}
+              {myCurrentVoteId ? t('changeVote') : t('confirmVote')} {selectedPlayerId && `${players.find(p => p.id === selectedPlayerId)?.name}`}
             </motion.button>
           )}
         </div>

@@ -65,7 +65,7 @@ export default function ResultsPage() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
           className="text-2xl font-bold text-slate-400 dark:text-white/50 tracking-[0.2em] uppercase"
         >
-          Revealing Results...
+          {t('revealingResults')}
         </motion.h2>
       </div>
     );
@@ -81,7 +81,7 @@ export default function ResultsPage() {
 
   const subtitle = (() => {
     if (guessResult === 'timeout') {
-      return "The Spy ran out of time to guess the location!";
+      return t('spyTimeoutMsg');
     }
     if (type === 'vote') {
       return spyFound
@@ -156,7 +156,7 @@ export default function ResultsPage() {
             className="glass-card p-4 text-center"
           >
             <p className="text-slate-500 dark:text-white/30 text-xs uppercase tracking-widest mb-1">{t('secretLocation')}</p>
-            <p className="gradient-text text-2xl font-black">{location.name}</p>
+            <p className="gradient-text text-2xl font-black">{typeof location === 'string' ? location : location.name}</p>
             {type === 'spy_guess' && (
               <p className="text-slate-400 dark:text-white/35 text-sm mt-1">
                 {t('spyGuessed')}{' '}
@@ -176,7 +176,7 @@ export default function ResultsPage() {
             transition={{ delay: 0.8 }}
             className="glass-card p-5"
           >
-            <p className="text-slate-500 dark:text-white/30 text-xs uppercase tracking-widest mb-4">{t('votes') || 'Voting Results'}</p>
+            <p className="text-slate-500 dark:text-white/30 text-xs uppercase tracking-widest mb-4">{t('votingResults')}</p>
             <div className="space-y-3">
               {gameResult.votes.filter(v => v.voteCount > 0).sort((a, b) => b.voteCount - a.voteCount).map(v => (
                 <div key={v.targetId} className="flex flex-col bg-slate-50/50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/5">
@@ -226,7 +226,7 @@ export default function ResultsPage() {
                     ? 'text-rose-500 dark:text-rose-400 bg-rose-500/10'
                     : 'text-violet-700 dark:text-violet-300 bg-violet-500/10'
                 }`}>
-                  {player.isSpy ? '🕵️ Spy' : player.role || '?'}
+                  {player.isSpy ? `🕵️ ${t('spyLabel')}` : player.role || '?'}
                 </span>
               </motion.div>
             ))}

@@ -39,6 +39,16 @@ const T = {
     spiesLabel: 'Spies',
     setsLabel: 'Sets',
     shareNote: 'Share the room code with friends to invite them',
+    leaderboard: 'Leaderboard',
+    spyWinsScore: 'Spy wins (3 pts)',
+    detectiveWinsScore: 'Caught spy (1 pt)',
+    points: 'pt',
+    showLiveVotes: 'Show Live Votes',
+    showLiveVotesDesc: 'Players can see who voted for whom during the voting phase.',
+    allowWhispers: 'Allow Whispers',
+    allowWhispersDesc: 'Players can create custom private group chats.',
+    autoStartTimer: 'Auto-start timer',
+    votingTime: 'Voting Time',
 
     // Location Set labels
     setStandard1: 'Standard Set 1',
@@ -69,6 +79,14 @@ const T = {
     spyTipTitle:  'You are the Spy!',
     spyTipDesc:   'Ask subtle questions and blend in. Use "Guess Location" when confident.',
     spyReminder:  "🕵️ You're the spy — listen carefully and guess!",
+    cancelVoteBtn: 'Cancel Vote',
+    omniscientMode: 'Omniscient Mode',
+    doNotSpoil: 'Do NOT spoil the game!',
+    trueLocation: 'True Location',
+    playerRoles: 'Player Roles',
+    firstQuestion: 'First Question',
+    youAskFirst: 'You ask the first question!',
+    playerAsksFirst: (n) => `👉 ${n} asks the first question!`,
 
     // Role Card
     tapToReveal:    'Tap to reveal your role',
@@ -99,6 +117,10 @@ const T = {
     moreVotes:       'more votes',
     vote:            'vote',
     votes:           'votes',
+    voted:           'Voted',
+    cancelVote:      'Cancel Vote',
+    changeVote:      'Change Vote',
+    confirmVote:     'Confirm Vote',
 
     // Results
     spyWins:     'The Spy Wins!',
@@ -115,6 +137,19 @@ const T = {
     leaveGame:    'Leave Room',
     waitingHostNewRound: 'Waiting for the host to start a new round...',
     minutes:      'min',
+    revealingResults: 'Revealing Results...',
+    spyLabel:     'Spy',
+    votingResults: 'Voting Results',
+    spyTimeoutMsg: 'The Spy ran out of time to guess the location!',
+
+    // Spy Guessing Phase
+    spyCaughtTitle: '🔒 Spy Caught!',
+    spyCaughtDesc: (n) => `${n} was the Spy.`,
+    spyLastChance: 'You have one last chance to win — Guess the location!',
+    waitingSpyGuess: 'Waiting for the Spy to guess the location...',
+    selectLocation: 'Select the Location',
+    submitGuess: 'Submit Guess',
+    loading: 'Loading...',
   },
 
   th: {
@@ -130,7 +165,7 @@ const T = {
     roomCodePlaceholder: 'กรอก หรือสุ่ม 🎲',
     joinBtn: 'เข้าร่วมเกม',
     joiningBtn: 'กำลังเข้าร่วม...',
-    firstPlayerNote: 'ผู้เล่นคนแรกที่สร้างห้องจะได้เป็นหัวหน้าห้อง (Host)',
+    firstPlayerNote: 'ผู้เล่นคนแรกที่สร้างห้องจะได้เป็นหัวหน้าห้อง',
     features: ['เล่นพร้อมกันแบบเรียลไทม์', 'รองรับมือถืออย่างสมบูรณ์', 'ไม่ต้องติดตั้ง'],
     avatarStyle: 'สไตล์ตัวละคร',
     reroll: 'สุ่มตัวละครใหม่',
@@ -154,12 +189,22 @@ const T = {
     spiesLabel: 'สายลับ',
     setsLabel: 'ชุด',
     shareNote: 'แชร์รหัสห้องให้เพื่อนเพื่อเชิญเข้าร่วม',
+    leaderboard: 'กระดานคะแนน',
+    spyWinsScore: 'ชนะในฐานะสายลับ (3 คะแนน)',
+    detectiveWinsScore: 'จับสายลับสำเร็จ (1 คะแนน)',
+    points: 'คะแนน',
+    showLiveVotes: 'แสดงโหวตสด',
+    showLiveVotesDesc: 'ผู้เล่นสามารถเห็นว่าใครโหวตให้ใครในช่วงโหวต',
+    allowWhispers: 'อนุญาตแชทลับ',
+    allowWhispersDesc: 'ผู้เล่นสามารถสร้างกลุ่มแชทลับส่วนตัวได้',
+    autoStartTimer: 'เริ่มเวลาอัตโนมัติ',
+    votingTime: 'เวลาโหวต',
 
     // Location Set labels
     setStandard1: 'มาตรฐาน ชุดที่ 1',
     setStandard2: 'มาตรฐาน ชุดที่ 2',
     setStandard3: 'มาตรฐาน ชุดที่ 3',
-    setStandardDesc: 'สถานที่คลาสสิกของ Spyfall',
+    setStandardDesc: 'สถานที่คลาสสิกจากเกม',
     setFantasy: 'แฟนตาซี',
     setFantasyDesc: 'ปราสาท มังกร และเวทมนตร์',
     setScifi: 'ไซไฟ',
@@ -167,7 +212,7 @@ const T = {
     setCustom: 'กำหนดเอง',
     setCustomDesc: 'สร้างสถานที่ของคุณเอง',
     editCustom: 'แก้ไขสถานที่',
-    customLocations: 'สถานที่ของคุณ (CUSTOM LOCATIONS)',
+    customLocations: 'สถานที่กำหนดเอง',
     customLocDesc: 'พิมพ์ชื่อสถานที่บรรทัดละ 1 ชื่อ',
     saveBtn: 'บันทึก',
 
@@ -184,6 +229,14 @@ const T = {
     spyTipTitle: 'คุณคือสายลับ!',
     spyTipDesc:  'ถามคำถามอย่างแนบเนียน ใช้ "เดาสถานที่" เมื่อมั่นใจ',
     spyReminder: '🕵️ คุณคือสายลับ — ฟังอย่างตั้งใจและเดา!',
+    cancelVoteBtn: 'ยกเลิกโหวต',
+    omniscientMode: 'โหมดผู้สังเกตการณ์',
+    doNotSpoil: 'ห้ามสปอยล์เกม!',
+    trueLocation: 'สถานที่จริง',
+    playerRoles: 'บทบาทผู้เล่น',
+    firstQuestion: 'คำถามแรก',
+    youAskFirst: 'คุณเป็นคนเริ่มถามคำถามแรก!',
+    playerAsksFirst: (n) => `👉 ${n} เริ่มถามคำถามแรก!`,
 
     // Role Card
     tapToReveal:    'แตะเพื่อเปิดเผยบทบาทของคุณ',
@@ -214,6 +267,10 @@ const T = {
     moreVotes:       'โหวต',
     vote:            'โหวต',
     votes:           'โหวต',
+    voted:           'โหวตแล้ว',
+    cancelVote:      'ยกเลิกโหวต',
+    changeVote:      'เปลี่ยนโหวต',
+    confirmVote:     'ยืนยันโหวต',
 
     // Results
     spyWins:     'สายลับชนะ!',
@@ -230,6 +287,19 @@ const T = {
     leaveGame:    'ออกจากห้อง',
     waitingHostNewRound: 'รอเจ้าบ้านเริ่มรอบใหม่...',
     minutes:      'นาที',
+    revealingResults: 'กำลังเปิดเผยผลลัพธ์...',
+    spyLabel:     'สายลับ',
+    votingResults: 'ผลการโหวต',
+    spyTimeoutMsg: 'สายลับหมดเวลาเดาสถานที่!',
+
+    // Spy Guessing Phase
+    spyCaughtTitle: '🔒 จับสายลับได้!',
+    spyCaughtDesc: (n) => `${n} คือสายลับ`,
+    spyLastChance: 'โอกาสสุดท้าย! เดาสถานที่ให้ถูกเพื่อชนะ!',
+    waitingSpyGuess: 'รอสายลับเดาสถานที่...',
+    selectLocation: 'เลือกสถานที่',
+    submitGuess: 'ยืนยันการเดา',
+    loading: 'กำลังโหลด...',
   },
 };
 

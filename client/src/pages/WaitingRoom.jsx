@@ -170,7 +170,7 @@ export default function WaitingRoom() {
               {hasScores && (
                 <div className="mt-8 border-t border-slate-200 dark:border-white/10 pt-6">
                   <h3 className="text-slate-800 dark:text-white font-semibold flex items-center gap-2 mb-4">
-                    <span>🏆</span> กระดานคะแนน (Leaderboard)
+                    <span>🏆</span> {t('leaderboard')}
                   </h3>
                   <div className="space-y-2">
                     {sortedScores.map(([name, scores], index) => {
@@ -182,13 +182,13 @@ export default function WaitingRoom() {
                             <span className="text-slate-700 dark:text-white font-medium">{name}</span>
                           </div>
                           <div className="flex items-center gap-4 text-xs font-semibold">
-                            <div className="flex items-center gap-1 text-rose-500" title="ชนะในฐานะ Spy (3 คะแนน)">
+                            <div className="flex items-center gap-1 text-rose-500" title={t('spyWinsScore')}>
                               <span>🕵️</span> {scores.spyWins}
                             </div>
-                            <div className="flex items-center gap-1 text-emerald-500" title="จับ Spy สำเร็จ (1 คะแนน)">
+                            <div className="flex items-center gap-1 text-emerald-500" title={t('detectiveWinsScore')}>
                               <span>👥</span> {scores.detectiveWins}
                             </div>
-                            <div className="w-10 text-right text-violet-600 dark:text-violet-400 text-sm">{totalScore} pt</div>
+                            <div className="w-10 text-right text-violet-600 dark:text-violet-400 text-sm">{totalScore} {t('points')}</div>
                           </div>
                         </div>
                       );
@@ -310,9 +310,9 @@ export default function WaitingRoom() {
                 {/* Show Votes Toggle */}
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <label className="text-sm font-semibold text-slate-700 dark:text-white/90">Show Live Votes</label>
+                    <label className="text-sm font-semibold text-slate-700 dark:text-white/90">{t('showLiveVotes')}</label>
                     <p className="text-xs text-slate-500 dark:text-white/40 leading-snug max-w-[200px] mt-0.5">
-                      Players can see who voted for whom during the voting phase.
+                      {t('showLiveVotesDesc')}
                     </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -329,9 +329,9 @@ export default function WaitingRoom() {
                 {/* Allow Whisper Toggle */}
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <label className="text-sm font-semibold text-slate-700 dark:text-white/90">Allow Whispers</label>
+                    <label className="text-sm font-semibold text-slate-700 dark:text-white/90">{t('allowWhispers')}</label>
                     <p className="text-xs text-slate-500 dark:text-white/40 leading-snug max-w-[200px] mt-0.5">
-                      Players can create custom private group chats.
+                      {t('allowWhispersDesc')}
                     </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -386,7 +386,7 @@ export default function WaitingRoom() {
                 {/* Voting Timer */}
                 <div className="mb-6">
                   <label className="text-slate-500 dark:text-white/35 text-xs uppercase tracking-widest mb-2 block">
-                    Voting Time (Discussion)
+                    {t('votingTime')}
                   </label>
                   <div className="grid grid-cols-4 gap-1.5">
                     {[1, 2, 3, 5].map(m => (
