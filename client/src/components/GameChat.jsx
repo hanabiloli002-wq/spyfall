@@ -11,7 +11,7 @@ export default function GameChat() {
   const [text, setText] = useState('');
   const [showWhisperModal, setShowWhisperModal] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [toasts, setToasts] = useState([]);
   const [unreadCounts, setUnreadCounts] = useState({});
   
