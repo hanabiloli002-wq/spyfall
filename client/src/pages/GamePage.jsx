@@ -221,6 +221,8 @@ export default function GamePage() {
             </div>
           </motion.div>
         )}
+      </div>
+
       {/* ── Spy guess modal ─── */}
       <AnimatePresence>
         {showGuess && (
