@@ -52,7 +52,7 @@ const initialState = {
   hasVoted: false,
 
   // Unified Chat
-  channels: [], // array of { id, name, type, messages, memberIds? }
+  channels: [{ id: 'all', name: 'All', type: 'all', members: 'all', messages: [] }], // array of { id, name, type, messages, memberIds? }
   spyNote: '',
 
   // End
@@ -187,8 +187,13 @@ function reducer(state, action) {
         error: action.payload.message || 'You were kicked from the room.',
       };
       
-    case 'CHAT_CHANNELS_SYNC':
-      return { ...state, channels: action.payload };
+    case 'CHAT_CHANNELS_SYNC': {
+      let newChannels = action.payload || [];
+      if (!newChannels.some(ch => ch.id === 'all')) {
+        newChannels = [{ id: 'all', name: 'All', type: 'all', members: 'all', messages: [] }, ...newChannels];
+      }
+      return { ...state, channels: newChannels };
+    }
 
     case 'CHAT_MSG_RECEIVED': {
       const { channelId, message } = action.payload;
