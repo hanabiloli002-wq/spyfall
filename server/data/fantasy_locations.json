@@ -1,0 +1,46 @@
+{
+  "setId": "fantasy",
+  "setName": "Fantasy Set",
+  "locations": [
+    {
+      "name": "Dragon's Lair",
+      "roles": ["Dragon Knight", "Egg Thief", "Baby Dragon", "Wizard", "Guard", "Princess", "Bard", "Treasure Hunter"]
+    },
+    {
+      "name": "Magic School",
+      "roles": ["Headmaster", "Exchange Student", "Janitor", "Librarian", "Potion Master", "Ghost", "Professor", "New Student"]
+    },
+    {
+      "name": "Enchanted Forest",
+      "roles": ["Elf Ranger", "Fairy", "Lost Knight", "Witch", "Woodland Spirit", "Goblin", "Talking Animal", "Cursed Prince"]
+    },
+    {
+      "name": "Underwater Kingdom",
+      "roles": ["Mermaid Queen", "Sea Wizard", "Pearl Diver", "Shark Guard", "Coral Keeper", "Sailor", "Sea Witch", "Treasure Mapper"]
+    },
+    {
+      "name": "Dwarf Mine",
+      "roles": ["Foreman", "Gem Cutter", "Cave Troll", "Mine Cart Driver", "Blacksmith", "Treasure Hunter", "Tunnel Digger", "Guard"]
+    },
+    {
+      "name": "Sky Castle",
+      "roles": ["Cloud Mage", "Air Knight", "Wind Sprite", "Royal Advisor", "Storm Dragon", "Sky Pirate", "Royal Historian", "Griffon Rider"]
+    },
+    {
+      "name": "Haunted Mansion",
+      "roles": ["Butler Ghost", "Vampire", "Exorcist", "Lost Soul", "Witch", "Curious Visitor", "Medium", "Poltergeist"]
+    },
+    {
+      "name": "Ancient Ruins",
+      "roles": ["Archaeologist", "Cursed Pharaoh", "Treasure Hunter", "Spirit Guardian", "Relic Thief", "Mystic Scholar", "Desert Nomad", "Animated Statue"]
+    },
+    {
+      "name": "Elven City",
+      "roles": ["High Elf Ruler", "Wood Elf Scout", "Dwarven Ambassador", "Human Trader", "Elven Archer", "City Guard", "Herbalist", "Bard"]
+    },
+    {
+      "name": "Wizard's Tower",
+      "roles": ["Arch Wizard", "Apprentice", "Familiar", "Visiting Scholar", "Courier", "Tower Guardian", "Book Keeper", "Alchemy Student"]
+    }
+  ]
+}

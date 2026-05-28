@@ -1,0 +1,46 @@
+{
+  "setId": "scifi",
+  "setName": "Sci-Fi Set",
+  "locations": [
+    {
+      "name": "Space Station",
+      "roles": ["Commander", "Engineer", "Alien Ambassador", "Medic", "Scientist", "Pilot", "Communications Officer", "Life Support Tech"]
+    },
+    {
+      "name": "Alien Planet",
+      "roles": ["Colonist", "Native Alien", "Xenobiologist", "Combat Marine", "Diplomat", "Stranded Astronaut", "Survey Drone Operator", "Terraformer"]
+    },
+    {
+      "name": "Cyberpunk City",
+      "roles": ["Hacker", "Corporate Exec", "Street Samurai", "Info Broker", "Medic", "Street Vendor", "Gang Leader", "Robot Repairman"]
+    },
+    {
+      "name": "Time Machine Lab",
+      "roles": ["Inventor", "Time Tourist", "Future Cop", "Historian", "Lab Assistant", "Paradox Agent", "Time Traveler", "Safety Inspector"]
+    },
+    {
+      "name": "Robot Factory",
+      "roles": ["Head Engineer", "Quality Controller", "Rogue Robot", "Programmer", "Security Bot", "Factory Worker", "Union Rep", "Delivery Bot"]
+    },
+    {
+      "name": "Starship Bridge",
+      "roles": ["Captain", "Navigator", "Chief Engineer", "Communications Officer", "Weapons Officer", "Alien Stowaway", "Science Officer", "Helmsman"]
+    },
+    {
+      "name": "Underground Bunker",
+      "roles": ["Bunker Commander", "Scientist", "Survivor", "Medical Officer", "Radio Operator", "Spy", "Ration Distributor", "Mechanic"]
+    },
+    {
+      "name": "Virtual Reality World",
+      "roles": ["Game Master", "Beta Tester", "Hacked NPC", "Developer", "Professional Player", "Trapped User", "Avatar Designer", "Admin"]
+    },
+    {
+      "name": "Mars Colony",
+      "roles": ["Colony Governor", "Geologist", "Oxygen Farmer", "Rover Driver", "Medic", "Earth Liaison", "Construction Bot", "Miner"]
+    },
+    {
+      "name": "Intergalactic Bazaar",
+      "roles": ["Market Master", "Alien Trader", "Smuggler", "Space Pirate", "Customs Agent", "Translator Droid", "Bounty Hunter", "Tourist"]
+    }
+  ]
+}

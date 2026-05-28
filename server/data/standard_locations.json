@@ -1,0 +1,54 @@
+{
+  "setId": "standard",
+  "setName": "Standard Set",
+  "locations": [
+    {
+      "name": "Beach",
+      "roles": ["Lifeguard", "Tourist", "Surfer", "Ice Cream Vendor", "Volleyball Player", "Sunbather", "Photographer", "Jet Ski Instructor"]
+    },
+    {
+      "name": "Casino",
+      "roles": ["Dealer", "Security Guard", "High Roller", "Cocktail Waitress", "Pit Boss", "Card Counter", "Slot Attendant", "Casino Manager"]
+    },
+    {
+      "name": "Circus",
+      "roles": ["Ringmaster", "Clown", "Acrobat", "Tightrope Walker", "Animal Trainer", "Ticket Seller", "Fire Breather", "Trapeze Artist"]
+    },
+    {
+      "name": "Hospital",
+      "roles": ["Doctor", "Nurse", "Patient", "Surgeon", "Orderly", "Visitor", "Pharmacist", "Radiologist"]
+    },
+    {
+      "name": "Movie Studio",
+      "roles": ["Director", "Actor", "Stunt Double", "Makeup Artist", "Camera Operator", "Script Supervisor", "Producer", "Extra"]
+    },
+    {
+      "name": "Police Station",
+      "roles": ["Police Chief", "Detective", "Patrol Officer", "Dispatcher", "Criminal", "Desk Sergeant", "Forensic Scientist", "Lawyer"]
+    },
+    {
+      "name": "Restaurant",
+      "roles": ["Chef", "Waiter", "Sommelier", "Busboy", "Food Critic", "Manager", "Host", "Dishwasher"]
+    },
+    {
+      "name": "School",
+      "roles": ["Teacher", "Principal", "Student", "Janitor", "Librarian", "Coach", "Cafeteria Worker", "Substitute Teacher"]
+    },
+    {
+      "name": "Airport",
+      "roles": ["Pilot", "Flight Attendant", "Passenger", "Air Traffic Controller", "Baggage Handler", "Security Agent", "Ground Crew", "Customs Officer"]
+    },
+    {
+      "name": "Supermarket",
+      "roles": ["Cashier", "Manager", "Stock Boy", "Butcher", "Baker", "Shopper", "Security Guard", "Delivery Driver"]
+    },
+    {
+      "name": "Pirate Ship",
+      "roles": ["Captain", "First Mate", "Navigator", "Cannoneer", "Cook", "Prisoner", "Surgeon", "Lookout"]
+    },
+    {
+      "name": "University",
+      "roles": ["Professor", "Student", "Dean", "Lab Assistant", "Librarian", "Janitor", "Campus Police", "Exchange Student"]
+    }
+  ]
+}
