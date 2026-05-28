@@ -194,9 +194,10 @@ function reducer(state, action) {
       const { channelId, message } = action.payload;
       return {
         ...state,
+        toastMessage: { channelId, message, id: message.id },
         channels: state.channels.map(ch => 
           ch.id === channelId 
-            ? { ...ch, messages: [...ch.messages, message] }
+            ? { ...ch, messages: [...ch.messages.slice(-99), message] }
             : ch
         )
       };

@@ -61,15 +61,7 @@ export default function RoleCard() {
               transform: 'rotateY(180deg)',
             }}
           >
-            {/* ID Card Header */}
-            <div className={`h-12 w-full flex items-center px-4 border-b ${isSpy ? 'bg-rose-900/50 border-rose-500/30' : 'bg-slate-800 border-emerald-500/30'}`}>
-              <div className={`text-[10px] uppercase tracking-widest font-bold ${isSpy ? 'text-rose-300' : 'text-emerald-400'}`}>
-                {isSpy ? 'Threat Level: Critical' : 'Clearance: Level 5'}
-              </div>
-              <div className="ml-auto w-12 h-4 rounded border opacity-50 flex items-center justify-between px-1">
-                <div className="w-1 h-2 bg-current" /><div className="w-1 h-2 bg-current" /><div className="w-1 h-2 bg-current" />
-              </div>
-            </div>
+
 
             <div className="flex-1 p-5 flex flex-col justify-center relative">
               {/* Hologram pattern */}
@@ -146,11 +138,7 @@ export default function RoleCard() {
               )}
             </div>
             
-            {/* ID Card Footer */}
-            <div className={`h-6 w-full flex items-center justify-between px-4 text-[8px] tracking-widest uppercase font-bold opacity-60 ${isSpy ? 'bg-rose-950 text-rose-400' : 'bg-slate-900 text-emerald-400'}`}>
-              <span>ID: {Math.random().toString(36).substr(2, 8).toUpperCase()}</span>
-              <span>AUTH: VALID</span>
-            </div>
+
           </div>
         </motion.div>
       </div>
